@@ -14,12 +14,25 @@ import json
 with open('config.json','r') as f:
     config = json.load(f) 
 
-dataset_csv_path = os.path.join(config['output_folder_path']) 
+model_path = os.path.join(config['output_model_path'])
 test_data_path = os.path.join(config['test_data_path']) 
 
 
+outpath = os.getcwd()+model_path
 #################Function for model scoring
 def score_model():
-    #this function should take a trained model, load test data, and calculate an F1 score for the model relative to the test data
-    #it should write the result to the latestscore.txt file
+    with open(outpath+"trainedmodel.pkl",'rb') as f:
+        model  = pickle.load(f)
+   # load test data
+    test_data = pd.read_csv(os.getcwd()+test_data_path+"testdata.csv")
+    y = test_data['exited']
+    X = test_data.drop(['corporation','exited'],axis=1)
+    predicted = model.predict(X)
+    f1score = metrics.f1_score(predicted,y)
+    print(f'\n{f1score}')
+    # write the result to the latestscore.txt
+    with open(os.path.join(outpath,'latestscore.txt'), 'w' ) as f:
+        f.write(str(f1score))
+if __name__=="__main__":
+    score_model()
 
