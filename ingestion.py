@@ -9,8 +9,8 @@ from datetime import datetime
 with open("config.json", "r") as f:
     config = json.load(f)
 
-input_folder_path = config["input_folder_path"]
-output_folder_path = config["output_folder_path"]
+input_folder_path = config["input_folder_path"]  # sourcedata
+output_folder_path = config["prod_deployment_path"]  # production_deployment
 
 directory_files = os.listdir(os.getcwd() + input_folder_path)
 filenames = [filename for filename in directory_files if filename.endswith(".csv")]
@@ -38,7 +38,7 @@ def merge_multiple_dataframe():
     date = datetime.now()
     timenow = str(date.year)+ '/'+str(date.month)+ '/'+str(date.day)
     # record the location, name, length, and time of the ingested date file
-    allrecords = [output_folder_path, file_name, len(final_data), timenow]
+    allrecords = [output_folder_path, filenames, len(final_data), timenow]
     with open(os.path.join(path_out,'ingestedfiles.txt'), 'w') as f:
         f.write(str(allrecords))
 
