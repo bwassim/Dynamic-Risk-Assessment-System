@@ -10,6 +10,16 @@ with open('config.json', 'r') as f:
 
 model_path = os.path.join(config['output_model_path'])
 
+def check_app_port(port=8000):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    result = sock.connect_ex(("127.0.0.1", 8000))
+    if result == 0:
+        print("API calls - check_app_port() ... port {} is open".format(port))
+    else:
+        print("API calls - check_app_port() ... port {} is not open".format(port))
+    sock.close()
+    return result == 0
+
 #Call each API endpoint and store the responses
 def run_api_endpoints():
     print(f"API for prediction result: by default testdata/testdata.csv is chosen \n {URL+'/prediction'}")

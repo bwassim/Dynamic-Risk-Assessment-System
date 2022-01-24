@@ -1,6 +1,6 @@
 Package            Version  Latest Type
 ------------------ -------- ------ -----
-anyio              3.3.4    3.4.0  wheel
+anyio              3.3.4    3.5.0  wheel
 argon2-cffi        21.1.0   21.3.0 wheel
 attrs              21.2.0   21.4.0 wheel
 cffi               1.14.6   1.15.0 wheel

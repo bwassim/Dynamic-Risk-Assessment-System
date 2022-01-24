@@ -10,7 +10,8 @@ with open("config.json", "r") as f:
     config = json.load(f)
 
 input_folder_path = config["input_folder_path"]  # sourcedata
-output_folder_path = config["prod_deployment_path"]  # production_deployment
+# output_folder_path = config["prod_deployment_path"]  # production_deployment
+output_folder_path = config["output_folder_path"] # ingesteddata
 
 directory_files = os.listdir(os.getcwd() + input_folder_path)
 filenames = [filename for filename in directory_files if filename.endswith(".csv")]

@@ -11,7 +11,10 @@ import json
 import os
 import ast
 import subprocess
+import logging
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('fullprocess')
 
 ##################Load config.json and get environment variables
 with open('config.json','r') as f:
@@ -31,21 +34,23 @@ def check_new_data():
     ingested_path = os.getcwd() + deployed_path + 'ingestedfiles.txt'
     with open(ingested_path, 'r') as f:
         ingested_info = ast.literal_eval(f.read())
-    print(f'ingested files info: {ingested_info}')
+    logger.info('Ingested file info: %s', ingested_info)
 
     # second, determine whether the source data folder has files that aren't listed in ingestedfiles.txt
     sourcedata_path = os.getcwd() + input_folder_path
     ingested_files = [f for f in os.listdir(sourcedata_path) if f.endswith('.csv')]
-
-    return set(ingested_files).difference(set(ingested_info[1]))
+    logger.info(f'These are the new files in sourcedata {ingested_files}')
+    difference = set(ingested_files).difference(set(ingested_info[1]))
+    file_exist = bool(len(difference))
+    logger.info("Are there new files for ingestion? %s - here they are: %s", file_exist, difference )
+    return  file_exist
 
 def check_drift():
     """Check with the newly ingested data if there is model drift
        Return True if new f1score is lower than the old one"""
 
-    score_path = os.getcwd()+deployed_path+"latestscore.txt"
     output_data = os.getcwd()+output_folder_path
-    with open(score_path, 'r') as f:
+    with open(os.getcwd()+logs_path+"latestscore.txt", 'r') as f:
         old_f1score = float(f.read())
 
     # Generate the new score for the new data
@@ -53,22 +58,24 @@ def check_drift():
     y = data['exited']
     ypred = model_predictions(data)
     new_f1score = f1_score(y, ypred)
-    print(f"new f1score: {new_f1score} vs old f1score: {old_f1score}")
-
+    logger.info(f"new f1score: {new_f1score} vs old f1score: {old_f1score}")
     return new_f1score < old_f1score
 
 def ingest_new_data():
     """Run the ingestion python file"""
+    logger.info("ingestion just started...")
     subprocess.run(['python', 'ingestion.py'], stdout=subprocess.PIPE)
 
 def retrain_model():
     """Retrain the model with the new data"""
+    logger.info("Training a new model...")
     subprocess.run(['python', 'training.py'], stdout=subprocess.PIPE)
 
 
 def redeploy_model():
     """copy the latest pickle file, the latestscore.txt value,
         and the ingestedfiles.txt file into the deployment directory"""
+    logger.info("deploying a new model")
     subprocess.run(['python', 'deployment.py'], stdout=subprocess.PIPE)
 
 def diagnostics_and_reporting():

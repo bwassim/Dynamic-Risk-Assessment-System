@@ -3,10 +3,15 @@ import pandas as pd
 import numpy as np
 import pickle
 import os
+import logging
 from sklearn import metrics
 # from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 import json
+
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('Training')
 
 ###################Load config.json and get path variables
 with open('config.json','r') as f:
@@ -35,8 +40,9 @@ def train_model():
 
     #fit the logistic regression to your data
     model.fit(X,y)
+    logger.info(f'model score: {model.score(X,y)}')
     #write the trained model to your workspace in a file called trainedmodel.pkl
-    print(f'model saved location: {os.getcwd() + model_path}')
+    logger.info(f'model saved location: {os.getcwd() + model_path}')
     pickle.dump(model, open(os.getcwd()+model_path+"trainedmodel.pkl", 'wb'))
 
 if __name__=='__main__':
