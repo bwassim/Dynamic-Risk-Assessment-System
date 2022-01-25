@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-
+import socket
 #Specify a URL that resolves to your workspace
 URL = "http://127.0.0.1:8000"
 
@@ -34,7 +34,7 @@ def run_api_endpoints():
     responses = [response1, response2, response3, response4]
     # save to file apireturn.txt
     path = os.getcwd() +model_path
-    with open(os.path.join(path, "apireturn.txt"), 'w') as f:
+    with open(os.path.join(path, "apireturn2.txt"), 'w') as f:
         f.writelines(responses)
 
 #write the responses to your workspace

@@ -94,8 +94,7 @@ def outdated_packages_list():
     # list of outdated packages
     logs = os.getcwd()+logs_path
     outdated = subprocess.check_output(['pip', 'list', '--outdated'])
-    df = pd.read_csv(StringIO(outdated.decode('utf-8')), index_col='Package', sep=r"\s+", skiprows=[1], engine='python')
-    print(df)
+    # df = pd.read_csv(StringIO(outdated.decode('utf-8')), index_col='Package', sep=r"\s+", skiprows=[1], engine='python')
     with open(os.path.join(logs,"outdated.txt"), 'wb') as f:
         f.write(outdated)
     logger.info(f"The outdated packages are listed on the third column\n {outdated.decode('utf-8')}")

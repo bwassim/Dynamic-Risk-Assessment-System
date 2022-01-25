@@ -2,6 +2,7 @@ import pickle
 
 import training
 import deployment
+import apicalls
 from diagnostics import model_predictions
 from scoring import score_model
 from sklearn.metrics import f1_score
@@ -14,7 +15,7 @@ import subprocess
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('fullprocess')
+logger = logging.getLogger('Fullprocess')
 
 ##################Load config.json and get environment variables
 with open('config.json','r') as f:
@@ -42,7 +43,10 @@ def check_new_data():
     logger.info(f'These are the new files in sourcedata {ingested_files}')
     difference = set(ingested_files).difference(set(ingested_info[1]))
     file_exist = bool(len(difference))
-    logger.info("Are there new files for ingestion? %s - here they are: %s", file_exist, difference )
+    if file_exist:
+        logger.info("Are there new files for ingestion? %s - here they are: %s", file_exist, difference )
+    else:
+        logger.info("There is no new file to be ingested")
     return  file_exist
 
 def check_drift():
@@ -50,7 +54,7 @@ def check_drift():
        Return True if new f1score is lower than the old one"""
 
     output_data = os.getcwd()+output_folder_path
-    with open(os.getcwd()+logs_path+"latestscore.txt", 'r') as f:
+    with open(os.getcwd()+deployed_path+"latestscore.txt", 'r') as f:
         old_f1score = float(f.read())
 
     # Generate the new score for the new data
@@ -80,7 +84,7 @@ def redeploy_model():
 
 def diagnostics_and_reporting():
     """Run the scoring, diagnostics and reporting process"""
-    subprocess.run(['python', 'scoring.py'], stdout=subprocess.PIPE)
+    # subprocess.run(['python', 'scoring.py'], stdout=subprocess.PIPE)
     subprocess.run(['python', 'diagnostics.py'], stdout=subprocess.PIPE)
     subprocess.run(['python', 'reporting.py'], stdout=subprocess.PIPE)
 
@@ -92,10 +96,17 @@ def main():
         drift = check_drift()
         if drift:
             retrain_model()
+            subprocess.run(['python', 'scoring.py'], stdout=subprocess.PIPE)
             redeploy_model()
-            diagnostics_and_reporting()
-
-
+            if apicalls.check_app_port():
+                logger.info("Running diagnostics for new model in app..")
+                apicalls.run_api_endpoints()
+                subprocess.run(['python', 'reporting.py'], stdout=subprocess.PIPE)
+            else:
+                diagnostics_and_reporting()
+        else:
+            logger.info("Model has not drifted")
+        logger.info("Completed")
 
 
 
