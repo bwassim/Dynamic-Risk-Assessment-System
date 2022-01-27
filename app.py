@@ -27,7 +27,6 @@ def root():
 def predict():
     data_name = request.args.get('filename')
     pred_lst = diagnostics.model_predictions(data_name)
-    print(f'This is the predicted value list:\n {pred_lst}')
     return jsonify({'prediction':str(pred_lst)})
 
 #######################Scoring Endpoint
