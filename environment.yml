@@ -1,0 +1,28 @@
+name: dynamic_assessemnt
+channels:
+  - conda-forge
+dependencies:
+  - click
+  - cycler
+  - Flask
+  - gunicorn
+  - itsdangerous
+  - Jinja2
+  - joblib
+  - kiwisolver
+  - MarkupSafe
+  - matplotlib
+  - numpy
+  - pandas
+  - Pillow
+  - pyparsing
+  - python-dateutil
+  - pytz
+  - scikit-learn
+  - python=3.9  
+  - scipy
+  - seaborn
+  - six
+  - threadpoolctl
+  - Werkzeug
+  - requests
