@@ -42,6 +42,7 @@ def score_model(file_name=None):
 
     with open(os.getcwd() + model_path + "latestscore.txt", "w") as f:
         f.write(str(f1score))
+
     logger.info(f"F1 score is saved in: {os.getcwd() + model_path + 'latestscore.txt'} ")
 
     return f1score

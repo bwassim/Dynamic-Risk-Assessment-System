@@ -7,7 +7,7 @@ and revenue. Because the industry is dynamic and constantly changing,  and the m
 a month ago might not still be accurate today, it is necessary to setup a process and scripts to re-train, 
 re-deploy, monitor and report the ML model, so the comapny get risk assessement that are as accurate as 
 possible to avoid client attrition. 
-
+nothin
 <p align="center">
 <img  src="./images/dynamic-risk.png"/>
 </p>
@@ -131,4 +131,120 @@ and the third will be for deploying the trained model.
 ```bash 
 > python training.py
 ```
-This script train a logistic 
+This script trains a logistic regression model from the previously ingested file to predict attrition risk and saves the model ``trainedmodel.pkl`` to the directory in `output_model_path` 
+
+### Model Scoring
+```bash
+> python scoring.py
+```
+Computes the F1 Score of the trained model with the test dataset and then save the score `latestscore.txt` in the directory specified by `output_model_path`.
+
+### Model Deployment 
+```bash 
+> python deployment.py
+```
+The script make copies of the trained model `trainedmodel.pkl`, score `latestscore.txt` , and a record of the ingested data `ingestedfiles.txt`, from their locations to the deployment directory `production_deployment`.
+
+## 3. Data Diagnostics
+```bash
+> python diagnostics.py
+```
+This script contains function to do prediction, some statistics on the data, percentage of missing data, a function that times the training and the ingestion python scripts. Finally a function that displays the outdated packages.
+
+### Model prediction 
+read the deployed model and a test dataset, calculate predictions
+### Summary statistics
+Returns mean, median and standard deviation of the data
+### Missing data
+Returns the the percentage of `NA values` for each columns in the final dataset 'finaldata.csv'
+### Execution time 
+Returns a list containing the execution time of both ingestion script and the training python script in seconds
+### Dependencies 
+Returns a list of the packages that needs to be updated 
+```bash
+Package         Version Latest Type
+--------------- ------- ------ -----
+click           7.1.2   8.0.3  wheel
+cycler          0.10.0  0.11.0 wheel
+Flask           1.1.2   2.0.2  wheel
+gunicorn        20.0.4  20.1.0 wheel
+itsdangerous    1.1.0   2.0.1  wheel
+Jinja2          2.11.3  3.0.3  wheel
+joblib          1.0.1   1.1.0  wheel
+kiwisolver      1.3.1   1.3.2  wheel
+MarkupSafe      1.1.1   2.0.1  wheel
+matplotlib      3.3.4   3.5.1  wheel
+numpy           1.20.1  1.22.1 wheel
+pandas          1.2.2   1.4.0  wheel
+Pillow          8.1.0   9.0.0  wheel
+pip             21.1.2  21.3.1 wheel
+pyparsing       2.4.7   3.0.7  wheel
+python-dateutil 2.8.1   2.8.2  wheel
+pytz            2021.1  2021.3 wheel
+requests        2.26.0  2.27.1 wheel
+scikit-learn    0.24.1  1.0.2  wheel
+scipy           1.6.1   1.7.3  wheel
+seaborn         0.11.1  0.11.2 wheel
+setuptools      57.0.0  60.5.0 wheel
+six             1.15.0  1.16.0 wheel
+threadpoolctl   2.1.0   3.0.0  wheel
+Werkzeug        1.0.1   2.0.2  wheel
+wheel           0.36.2  0.37.1 wheel
+```
+## 4. Model Reporting 
+```bash
+> python reporting.py
+```
+This script generates plot related to the ML model performance with the test data. The generated confusion matrix is shown below.
+
+![confusion](models/confusion_matrix.png)
+## 5. API 
+```bash 
+>python app.py
+```
+![flask](images/flask.png)
+
+In the previous project we have used FastAPI. This time Flask is another tool to create and deploy api. A local web service is launched when running the python script `app.py`. Four endpoints are created within the script: 
+* ``Prediction endpoint``:  
+ An endpoint given at `/prediction`. This endpoint takes a dataset's file location as its input, and return the outputs of the prediction function
+* ``Scoring Endpoint``:  
+endpoint at `/summarystats`. This endpoint  runs the scoring.py script  and return its output.
+* ``Summary Statistics Endpoint``:  
+endpoint at `/summarystats`. This endpoint needs to run the summary statistics function and return its outputs.
+* ``Diagnostics Endpoint``:  
+endpoint at `/diagnostics`. This endpoint  runs the timing, missing data, and dependency check functions  and return their outputs.
+### Calling API endpoints 
+```bash 
+> python apicalls.py
+```
+This script calls each of your endpoints, combine the outputs, and write the combined outputs to a file call `apireturns.txt`.
+
+## Process Automation 
+```bash
+> python fullprocess.py
+```
+In this step we will create scripts that automate ML model scoring and monitoring process. This step includes checking for the criteria that will require model re-training and redeployment at 10 minutes interval
+
+![process_automation](images/process_automation.png)
+
+### Cron Job for the full pipeline 
+We want to run the `fullprocess.py` at regular interval, without manual intervention. Therefore, we need to write a crontab file that runs each 10 minutes as an example. 
+* Start the cron service
+```bash 
+> service cron start 
+ ```
+* Open the workspace's crontab file  by running 
+```bash
+> crontab -e 
+```
+* In order to check the crontab file use 
+```bash
+> python crontab -l 
+```
+
+
+
+
+
+
+
